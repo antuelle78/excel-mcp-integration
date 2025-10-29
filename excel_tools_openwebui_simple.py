@@ -12,8 +12,20 @@ from typing import Optional, List, Dict, Any
 
 class Tools:
     def __init__(self):
-        self.mcp_server_url = "http://localhost:9080/mcp"
-        self.file_server_url = "http://localhost:9081"
+        # For Kubernetes deployment in excel-mcp namespace:
+        # - MCP server: http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp
+        # - File server: http://excel-mcp-service.excel-mcp.svc.cluster.local:8001/files/
+        #
+        # For Docker deployment:
+        # - MCP server: http://host.docker.internal:9080/mcp
+        # - File server: http://host.docker.internal:9081/files/
+        #
+        # For local development:
+        # - MCP server: http://localhost:8000/mcp
+        # - File server: http://localhost:8001/files/
+
+        self.mcp_server_url = "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp"
+        self.file_server_url = "http://excel-mcp-service.excel-mcp.svc.cluster.local:8001"
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/event-stream"

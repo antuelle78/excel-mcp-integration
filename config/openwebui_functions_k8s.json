@@ -1,0 +1,300 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "create_excel_file",
+      "description": "Creates an Excel file with the given data. Use this tool when users want to create spreadsheets, tables, or Excel files with data. Provide filename, headers array, and 2D data array.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Name of the Excel file to create (will auto-append .xlsx if missing)"
+          },
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of column headers for the spreadsheet"
+          },
+          "sheet_data": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "2D array of data rows (each inner array is a row)"
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Name of the worksheet (optional, defaults to 'Sheet1')",
+            "default": "Sheet1"
+          }
+        },
+        "required": ["filename", "headers", "sheet_data"]
+      }
+    },
+    "api_call": {
+      "url": "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream"
+      },
+      "body_format": "jsonrpc",
+      "jsonrpc_template": {
+        "jsonrpc": "2.0",
+        "id": "{id}",
+        "method": "tools/call",
+        "params": {
+          "name": "create_excel_file",
+          "arguments": "{arguments}"
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_excel_info",
+      "description": "Gets information about an existing Excel file. Use this to check file details or analyze existing spreadsheets.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Name of the Excel file to analyze"
+          }
+        },
+        "required": ["filename"]
+      }
+    },
+    "api_call": {
+      "url": "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream"
+      },
+      "body_format": "jsonrpc",
+      "jsonrpc_template": {
+        "jsonrpc": "2.0",
+        "id": "{id}",
+        "method": "tools/call",
+        "params": {
+          "name": "get_excel_info",
+          "arguments": "{arguments}"
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "create_excel_chart",
+      "description": "Add charts and graphs to existing Excel files. Supports bar, line, pie, scatter, and area charts.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Target Excel file to add chart to"
+          },
+          "chart_type": {
+            "type": "string",
+            "enum": ["bar", "line", "pie", "scatter", "area"],
+            "description": "Type of chart to create"
+          },
+          "data_range": {
+            "type": "string",
+            "description": "Cell range for chart data (e.g., 'A1:C10')"
+          },
+          "title": {
+            "type": "string",
+            "description": "Chart title (optional)"
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Worksheet name (optional, defaults to first sheet)"
+          }
+        },
+        "required": ["filename", "chart_type", "data_range"]
+      }
+    },
+    "api_call": {
+      "url": "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream"
+      },
+      "body_format": "jsonrpc",
+      "jsonrpc_template": {
+        "jsonrpc": "2.0",
+        "id": "{id}",
+        "method": "tools/call",
+        "params": {
+          "name": "create_excel_chart",
+          "arguments": "{arguments}"
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "format_excel_cells",
+      "description": "Apply formatting to Excel cells including colors, borders, fonts, and styles.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Target Excel file"
+          },
+          "cell_range": {
+            "type": "string",
+            "description": "Cell range in A1:B5 format (e.g., 'A1:C10')"
+          },
+          "formatting": {
+            "type": "object",
+            "description": "Formatting options to apply"
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Worksheet name (optional, defaults to first sheet)"
+          }
+        },
+        "required": ["filename", "cell_range", "formatting"]
+      }
+    },
+    "api_call": {
+      "url": "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream"
+      },
+      "body_format": "jsonrpc",
+      "jsonrpc_template": {
+        "jsonrpc": "2.0",
+        "id": "{id}",
+        "method": "tools/call",
+        "params": {
+          "name": "format_excel_cells",
+          "arguments": "{arguments}"
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "import_csv_to_excel",
+      "description": "Convert CSV files to Excel format with proper formatting and structure.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "csv_file": {
+            "type": "string",
+            "description": "Source CSV file path or content"
+          },
+          "excel_file": {
+            "type": "string",
+            "description": "Target Excel filename"
+          },
+          "delimiter": {
+            "type": "string",
+            "description": "CSV delimiter character (default: ',')",
+            "default": ","
+          },
+          "has_headers": {
+            "type": "boolean",
+            "description": "Whether CSV has header row (default: true)",
+            "default": true
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Worksheet name (optional, defaults to 'Sheet1')",
+            "default": "Sheet1"
+          }
+        },
+        "required": ["csv_file", "excel_file"]
+      }
+    },
+    "api_call": {
+      "url": "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream"
+      },
+      "body_format": "jsonrpc",
+      "jsonrpc_template": {
+        "jsonrpc": "2.0",
+        "id": "{id}",
+        "method": "tools/call",
+        "params": {
+          "name": "import_csv_to_excel",
+          "arguments": "{arguments}"
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "export_excel_to_csv",
+      "description": "Export Excel worksheets to CSV format.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "excel_file": {
+            "type": "string",
+            "description": "Source Excel file"
+          },
+          "csv_file": {
+            "type": "string",
+            "description": "Target CSV filename"
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Worksheet name to export (optional, defaults to first sheet)"
+          },
+          "delimiter": {
+            "type": "string",
+            "description": "CSV delimiter character (default: ',')",
+            "default": ","
+          },
+          "include_headers": {
+            "type": "boolean",
+            "description": "Whether to include headers in CSV (default: true)",
+            "default": true
+          }
+        },
+        "required": ["excel_file", "csv_file"]
+      }
+    },
+    "api_call": {
+      "url": "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream"
+      },
+      "body_format": "jsonrpc",
+      "jsonrpc_template": {
+        "jsonrpc": "2.0",
+        "id": "{id}",
+        "method": "tools/call",
+        "params": {
+          "name": "export_excel_to_csv",
+          "arguments": "{arguments}"
+        }
+      }
+    }
+  }
+]

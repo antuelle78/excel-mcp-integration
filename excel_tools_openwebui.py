@@ -18,11 +18,21 @@ class Tools:
     _shared_initialized = False
     
     def __init__(self):
-        # IMPORTANT: Replace with the actual IP of the machine running the MCP server
-        # MCP server runs on port 9080, file server on 9081 (Docker mapped ports)
-        # Use host.docker.internal when Open-WebUI runs in Docker, otherwise localhost
-        self.mcp_server_url = os.getenv('MCP_SERVER_URL', "http://localhost:9080/mcp")
-        self.file_server_url = os.getenv('FILE_SERVER_URL', "http://host.docker.internal:9081")  # For file downloads (port 9081)
+        # IMPORTANT: Update these URLs based on your deployment method
+        # For Kubernetes deployment in excel-mcp namespace:
+        # - MCP server: http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp
+        # - File server: http://excel-mcp-service.excel-mcp.svc.cluster.local:8001/files/
+        #
+        # For Docker deployment:
+        # - MCP server: http://host.docker.internal:9080/mcp (or localhost:9080)
+        # - File server: http://host.docker.internal:9081/files/
+        #
+        # For local development:
+        # - MCP server: http://localhost:8000/mcp
+        # - File server: http://localhost:8001/files/
+
+        self.mcp_server_url = os.getenv('MCP_SERVER_URL', "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp")
+        self.file_server_url = os.getenv('FILE_SERVER_URL', "http://excel-mcp-service.excel-mcp.svc.cluster.local:8001")  # For file downloads
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/event-stream"

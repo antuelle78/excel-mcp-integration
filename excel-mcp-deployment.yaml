@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: excel-mcp-config
+  namespace: excel-mcp
+data:
+  HOST: "0.0.0.0"
+  PORT: "8000"
+  FILE_SERVER_PORT: "8001"
+  MAX_ROWS: "10000"
+  MAX_COLS: "100"
+  MAX_FILENAME_LENGTH: "255"
+  OUTPUT_DIR: "/app/output"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: excel-mcp-output-pvc
+  namespace: excel-mcp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi  # Adjust based on your needs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: excel-mcp
+  namespace: excel-mcp
+  labels:
+    app: excel-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: excel-mcp
+  template:
+    metadata:
+      labels:
+        app: excel-mcp
+    spec:
+      containers:
+      - name: excel-mcp
+        image: antuelle78/excel-mcp-integration:latest  # Or your custom image
+        ports:
+        - containerPort: 8000
+          name: mcp-server
+        - containerPort: 8001
+          name: file-server
+        envFrom:
+        - configMapRef:
+            name: excel-mcp-config
+        volumeMounts:
+        - name: output-storage
+          mountPath: /app/output
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: output-storage
+        persistentVolumeClaim:
+          claimName: excel-mcp-output-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: excel-mcp-service
+  namespace: excel-mcp
+  labels:
+    app: excel-mcp
+spec:
+  type: NodePort
+  ports:
+  - name: mcp-server
+    port: 8000
+    targetPort: 8000
+    nodePort: 31006
+    protocol: TCP
+  - name: file-server
+    port: 8001
+    targetPort: 8001
+    nodePort: 31007  # Optional: separate port for file server
+    protocol: TCP
+  selector:
+    app: excel-mcp

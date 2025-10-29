@@ -205,10 +205,11 @@ graph TB
 
 | Service | Status | URL |
 |---------|--------|-----|
-| 🔧 **MCP Server** | 🟢 **Running** | `http://your-server-ip:9080/mcp` |
-| 📁 **File Server** | 🟢 **Active** | `http://your-server-ip:9081/files/` |
+| 🔧 **MCP Server** | 🟢 **Running** | `http://excelgen.e-cancer.fr:31006/mcp` |
+| 📁 **File Server** | 🟢 **Active** | `http://excelgen.e-cancer.fr:31007/files/` |
 | 🤖 **AI Integration** | 🟢 **Tested** | Open-WebUI Compatible |
 | 🐳 **Docker** | 🟢 **Deployed** | `antuelle78/excel-mcp-integration` |
+| ☸️ **Kubernetes** | 🟢 **Ready** | `kubectl apply -f excel-mcp-deployment.yaml` |
 
 </div>
 
@@ -230,7 +231,7 @@ docker run -d \
 docker ps | grep excel-mcp
 
 # 🎯 Test connection
-curl http://localhost:9080/mcp
+curl http://excelgen.e-cancer.fr:31006/mcp
 ```
 
 **That's it! Your Excel MCP server is now running!** 🎉
@@ -297,9 +298,9 @@ pip install -r requirements.txt
 python src/main.py
 
 # Terminal 2: Start File Server (optional)
-python -m http.server 9081 -d output/
+python -m http.server 8001 -d output/
 
-# 🎯 Server ready at: http://localhost:9080/mcp
+# 🎯 Server ready at: http://localhost:8000/mcp
 ```
 
 </div>
@@ -313,7 +314,7 @@ python -m http.server 9081 -d output/
 Once your server is running, test it with this curl command:
 
 ```bash
-curl -X POST http://localhost:9080/mcp \
+curl -X POST http://localhost:8000/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{
@@ -783,7 +784,7 @@ docker run -d \
   antuelle78/excel-mcp-integration:latest
 
 # ✅ Verify deployment
-curl http://localhost:9080/mcp
+curl http://excelgen.e-cancer.fr:31006/mcp
 ```
 
 </div>
@@ -822,6 +823,110 @@ services:
 
 ---
 
+## ☸️ **Kubernetes Deployment**
+
+<div align="center">
+
+### 🚀 **Production-Ready K8s Setup**
+
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5?style=for-the-badge&logo=kubernetes)](excel-mcp-deployment.yaml)
+
+**Deploy on your k3s cluster with NodePort 31006**
+
+```bash
+# 📦 Deploy to Kubernetes
+kubectl apply -f excel-mcp-deployment.yaml
+
+# ✅ Verify deployment
+kubectl get pods
+kubectl get services
+
+# 🌐 Access your service
+curl http://excelgen.e-cancer.fr:31006/mcp
+```
+
+</div>
+
+### 🏗️ **Kubernetes Configuration**
+
+<div align="center">
+
+```yaml
+# 📄 excel-mcp-deployment.yaml (Production Ready)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: excel-mcp
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: excel-mcp
+        image: antuelle78/excel-mcp-integration:latest
+        ports:
+        - containerPort: 8000  # MCP Server
+        - containerPort: 8001  # File Server
+        envFrom:
+        - configMapRef:
+            name: excel-mcp-config
+        volumeMounts:
+        - name: output-storage
+          mountPath: /app/output
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: excel-mcp-service
+spec:
+  type: NodePort
+  ports:
+  - port: 8000
+    targetPort: 8000
+    nodePort: 31006  # External access
+  - port: 8001
+    targetPort: 8001
+    nodePort: 31007  # File downloads
+```
+
+</div>
+
+### 🔗 **Open-WebUI Integration**
+
+<div align="center">
+
+**Connect Open-WebUI from another namespace using internal DNS:**
+
+```json
+{
+  "api_config": {
+    "base_url": "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000",
+    "endpoints": {
+      "create_excel_file": {
+        "url": "/mcp",
+        "method": "POST"
+      }
+    }
+  }
+}
+```
+
+**📁 Use one of the Kubernetes config files:**
+- `config/openwebui_tools_k8s.json` - Basic tools configuration
+- `config/openwebui_functions_k8s.json` - Function-based configuration
+- `config/openwebui_tools_enhanced_k8s.json` - Enhanced tools with all features
+- `src/excel_assistant_pipe_k8s.py` - Pipe function for dedicated Excel assistant model
+
+**External Access URLs (for testing only):**
+- **MCP Server**: `http://excelgen.e-cancer.fr:31006/mcp`
+- **File Downloads**: `http://excelgen.e-cancer.fr:31007/files/`
+
+**⚠️ Important:** Always use internal DNS for service-to-service communication within the cluster.
+
+</div>
+
+---
+
 ## 🛠️ **Development & Architecture**
 
 <div align="center">
@@ -831,7 +936,8 @@ services:
 excel-mcp-integration/
 ├── 📁 src/                    # 🚀 Core source code
 │   ├── main.py               # Main MCP server
-│   ├── excel_assistant_pipe.py # Open-WebUI pipe function
+│   ├── excel_assistant_pipe.py # Open-WebUI pipe function (Docker)
+│   ├── excel_assistant_pipe_k8s.py # Open-WebUI pipe function (Kubernetes)
 │   └── web_api_wrapper.py    # REST API wrapper
 ├── 📁 tests/                  # 🧪 Test suite (23 scenarios)
 │   ├── test_core.py          # Core functionality
@@ -842,7 +948,12 @@ excel-mcp-integration/
 │   ├── DEPLOYMENT_GUIDE.md   # Deployment instructions
 │   └── test_prompts.md       # Test scenarios
 ├── 📁 config/                 # ⚙️ Configuration files
-│   ├── openwebui_tools.json  # Tool definitions
+│   ├── openwebui_tools.json  # Tool definitions (Docker)
+│   ├── openwebui_tools_k8s.json # Tool definitions (Kubernetes)
+│   ├── openwebui_functions.json # Function definitions (Docker)
+│   ├── openwebui_functions_k8s.json # Function definitions (Kubernetes)
+│   ├── openwebui_tools_enhanced.json # Enhanced tools (Docker)
+│   ├── openwebui_tools_enhanced_k8s.json # Enhanced tools (Kubernetes)
 │   └── pipe_requirements.txt # Dependencies
 ├── 🐳 Dockerfile             # Container build
 ├── 🐙 docker-compose.yml     # Orchestration
