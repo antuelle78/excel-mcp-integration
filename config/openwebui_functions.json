@@ -1,0 +1,94 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "create_excel_file",
+      "description": "Creates an Excel file with the given data. Use this tool when users want to create spreadsheets, tables, or Excel files with data. Provide filename, headers array, and 2D data array.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Name of the Excel file to create (will auto-append .xlsx if missing)"
+          },
+          "headers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of column headers for the spreadsheet"
+          },
+          "sheet_data": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "2D array of data rows (each inner array is a row)"
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Name of the worksheet (optional, defaults to 'Sheet1')",
+            "default": "Sheet1"
+          }
+        },
+        "required": ["filename", "headers", "sheet_data"]
+      }
+    },
+    "api_call": {
+      "url": "http://host.docker.internal:8001/mcp",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream"
+      },
+      "body_format": "jsonrpc",
+      "jsonrpc_template": {
+        "jsonrpc": "2.0",
+        "id": "{id}",
+        "method": "tools/call",
+        "params": {
+          "name": "create_excel_file",
+          "arguments": "{arguments}"
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_excel_info",
+      "description": "Gets information about an existing Excel file. Use this to check file details or analyze existing spreadsheets.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Name of the Excel file to analyze"
+          }
+        },
+        "required": ["filename"]
+      }
+    },
+    "api_call": {
+      "url": "http://host.docker.internal:8001/mcp",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json, text/event-stream"
+      },
+      "body_format": "jsonrpc",
+      "jsonrpc_template": {
+        "jsonrpc": "2.0",
+        "id": "{id}",
+        "method": "tools/call",
+        "params": {
+          "name": "get_excel_info",
+          "arguments": "{arguments}"
+        }
+      }
+    }
+  }
+]

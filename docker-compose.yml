@@ -1,0 +1,8 @@
+services:
+  exel-mcp:
+    build: .
+    ports:
+      - "9080:8000"  # MCP server
+      - "9081:8001"  # File server
+    volumes:
+      - .:/app

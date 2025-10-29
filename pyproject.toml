@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "exel_mcp"
+version = "0.1.0"
+description = "MCP server for Exel"
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastmcp = "^2.13.0.2"
+openpyxl = "^3.1.5"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.4.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

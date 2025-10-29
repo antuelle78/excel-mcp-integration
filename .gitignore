@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+server.log
+
+# Output files (keep structure but ignore content)
+output/*.xlsx
+output/*.xls
+output/*.csv
+
+# Test files
+test_*.py
+test_*.xlsx
+
+# Temporary files
+*.tmp
+*.temp
+
+# Documentation drafts
+*.md.bak
+*_DRAFT.md
+
+# Environment variables
+.env
+.env.local
+
+# Docker
+.dockerignore

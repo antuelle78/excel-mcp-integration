@@ -1,0 +1,281 @@
+{
+  "tools": [
+    {
+      "name": "create_excel_file",
+      "description": "Create Excel spreadsheets with custom data, headers, and formatting. Use this when users want to create spreadsheets, tables, or Excel files with data.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Excel filename (auto-appends .xlsx if missing)"
+          },
+          "headers": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of column headers for spreadsheet"
+          },
+          "sheet_data": {
+            "type": "array",
+            "items": {"type": "array", "items": {"type": "string"}},
+            "description": "2D array of data rows (each inner array is a row)"
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Name of worksheet (optional, defaults to 'Sheet1')",
+            "default": "Sheet1"
+          },
+          "formatting": {
+            "type": "object",
+            "description": "Optional formatting options",
+            "properties": {
+              "auto_width": {"type": "boolean", "default": true},
+              "header_bold": {"type": "boolean", "default": true},
+              "header_center": {"type": "boolean", "default": true}
+            }
+          }
+        },
+        "required": ["filename", "headers", "sheet_data"]
+      }
+    },
+    {
+      "name": "get_excel_info",
+      "description": "Analyze existing Excel files for structure, content, and metadata. Use this to check file details or analyze existing spreadsheets.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Excel file to analyze"
+          }
+        },
+        "required": ["filename"]
+      }
+    },
+    {
+      "name": "create_excel_chart",
+      "description": "Add charts and graphs to existing Excel files. Use this when users want to visualize data with charts.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Target Excel file to add chart to"
+          },
+          "chart_type": {
+            "type": "string",
+            "enum": ["bar", "line", "pie", "scatter", "area"],
+            "description": "Type of chart to create"
+          },
+          "data_range": {
+            "type": "string",
+            "description": "Cell range for chart data (e.g., 'A1:C10')"
+          },
+          "title": {
+            "type": "string",
+            "description": "Chart title (optional)"
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Worksheet name (optional, defaults to first sheet)"
+          }
+        },
+        "required": ["filename", "chart_type", "data_range"]
+      }
+    },
+    {
+      "name": "format_excel_cells",
+      "description": "Apply formatting to Excel cells including colors, borders, fonts, and styles. Use this to enhance spreadsheet appearance.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string",
+            "description": "Target Excel file"
+          },
+          "cell_range": {
+            "type": "string",
+            "description": "Cell range in A1:B5 format (e.g., 'A1:C10')"
+          },
+          "formatting": {
+            "type": "object",
+            "description": "Formatting options to apply",
+            "properties": {
+              "bold": {"type": "boolean"},
+              "italic": {"type": "boolean"},
+              "underline": {"type": "boolean"},
+              "font_size": {"type": "integer", "minimum": 6, "maximum": 72},
+              "font_color": {"type": "string"},
+              "background_color": {"type": "string"},
+              "border": {"type": "boolean"},
+              "border_color": {"type": "string"},
+              "alignment": {
+                "type": "string",
+                "enum": ["left", "center", "right", "justify"]
+              }
+            }
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Worksheet name (optional, defaults to first sheet)"
+          }
+        },
+        "required": ["filename", "cell_range", "formatting"]
+      }
+    },
+    {
+      "name": "import_csv_to_excel",
+      "description": "Convert CSV files to Excel format with proper formatting and structure. Use this when users want to convert CSV data to Excel.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "csv_file": {
+            "type": "string",
+            "description": "Source CSV file path or content"
+          },
+          "excel_file": {
+            "type": "string",
+            "description": "Target Excel filename"
+          },
+          "delimiter": {
+            "type": "string",
+            "description": "CSV delimiter character",
+            "default": ","
+          },
+          "has_headers": {
+            "type": "boolean",
+            "description": "Whether CSV has header row",
+            "default": true
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Worksheet name (optional, defaults to 'Sheet1')",
+            "default": "Sheet1"
+          }
+        },
+        "required": ["csv_file", "excel_file"]
+      }
+    },
+    {
+      "name": "export_excel_to_csv",
+      "description": "Export Excel worksheets to CSV format. Use this when users want to convert Excel data to CSV.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "excel_file": {
+            "type": "string",
+            "description": "Source Excel file"
+          },
+          "csv_file": {
+            "type": "string",
+            "description": "Target CSV filename"
+          },
+          "sheet_name": {
+            "type": "string",
+            "description": "Worksheet name to export (optional, defaults to first sheet)"
+          },
+          "delimiter": {
+            "type": "string",
+            "description": "CSV delimiter character",
+            "default": ","
+          },
+          "include_headers": {
+            "type": "boolean",
+            "description": "Whether to include headers in CSV",
+            "default": true
+          }
+        },
+        "required": ["excel_file", "csv_file"]
+      }
+    }
+  ],
+  "api_config": {
+    "base_url": "http://host.docker.internal:8001",
+    "timeout": 30,
+    "retry_attempts": 3,
+    "headers": {
+      "Content-Type": "application/json",
+      "Accept": "application/json, text/event-stream"
+    },
+    "endpoints": {
+      "create_excel_file": {
+        "path": "/mcp",
+        "method": "POST",
+        "body_template": {
+          "jsonrpc": "2.0",
+          "id": "${request_id}",
+          "method": "tools/call",
+          "params": {
+            "name": "create_excel_file",
+            "arguments": "${arguments}"
+          }
+        }
+      },
+      "get_excel_info": {
+        "path": "/mcp",
+        "method": "POST",
+        "body_template": {
+          "jsonrpc": "2.0",
+          "id": "${request_id}",
+          "method": "tools/call",
+          "params": {
+            "name": "get_excel_info",
+            "arguments": "${arguments}"
+          }
+        }
+      },
+      "create_excel_chart": {
+        "path": "/mcp",
+        "method": "POST",
+        "body_template": {
+          "jsonrpc": "2.0",
+          "id": "${request_id}",
+          "method": "tools/call",
+          "params": {
+            "name": "create_excel_chart",
+            "arguments": "${arguments}"
+          }
+        }
+      },
+      "format_excel_cells": {
+        "path": "/mcp",
+        "method": "POST",
+        "body_template": {
+          "jsonrpc": "2.0",
+          "id": "${request_id}",
+          "method": "tools/call",
+          "params": {
+            "name": "format_excel_cells",
+            "arguments": "${arguments}"
+          }
+        }
+      },
+      "import_csv_to_excel": {
+        "path": "/mcp",
+        "method": "POST",
+        "body_template": {
+          "jsonrpc": "2.0",
+          "id": "${request_id}",
+          "method": "tools/call",
+          "params": {
+            "name": "import_csv_to_excel",
+            "arguments": "${arguments}"
+          }
+        }
+      },
+      "export_excel_to_csv": {
+        "path": "/mcp",
+        "method": "POST",
+        "body_template": {
+          "jsonrpc": "2.0",
+          "id": "${request_id}",
+          "method": "tools/call",
+          "params": {
+            "name": "export_excel_to_csv",
+            "arguments": "${arguments}"
+          }
+        }
+      }
+    }
+  }
+}
