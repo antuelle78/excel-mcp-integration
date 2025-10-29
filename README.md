@@ -1,23 +1,116 @@
-# 🚀 **Excel MCP Integration** - AI-Powered Spreadsheet Creation
+# Excel MCP Integration
 
-<div align="center">
+AI-powered Excel spreadsheet creation through natural language commands using the Model Context Protocol (MCP).
 
-![Excel MCP Banner](https://img.shields.io/badge/Excel--MCP-AI--Powered-00ADD8?style=for-the-badge&logo=microsoft-excel&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Open-WebUI](https://img.shields.io/badge/Open--WebUI-Integrated-FF6B35?style=for-the-badge&logo=ollama&logoColor=white)
+## What is Excel MCP?
 
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github)](https://github.com/antuelle78/excel-mcp-integration)
-[![Docker Hub](https://img.shields.io/badge/Docker-Hub-2496ED?style=flat-square&logo=docker)](https://hub.docker.com/r/antuelle78/excel-mcp-integration)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+Excel MCP allows Large Language Models to create, manipulate, and analyze Excel spreadsheets through natural language. It integrates with AI assistants to transform conversational requests into professional Excel files.
 
-**Transform natural language into professional Excel spreadsheets instantly!** 🎯
+## Features
 
-[📖 **Documentation**](#-documentation) • [🚀 **Quick Start**](#-quick-start) • [🎨 **Features**](#-features) • [🧪 **Live Demo**](#-live-demo)
+- **Excel Creation**: Generate spreadsheets from natural language
+- **Advanced Formatting**: Headers, colors, borders, alignment
+- **Chart Generation**: Bar, line, pie, scatter charts
+- **CSV Integration**: Import/export CSV files
+- **Enterprise Security**: Input validation and path sanitization
+- **Multi-Language Support**: UTF-8 support
 
----
+## Quick Start
 
-</div>
+### Docker (Recommended)
+
+```bash
+docker run -d \
+  --name excel-mcp \
+  -p 9080:8000 \
+  -p 9081:8001 \
+  antuelle78/excel-mcp-integration:latest
+```
+
+### Local Development
+
+```bash
+git clone https://github.com/antuelle78/excel-mcp-integration.git
+cd excel-mcp-integration
+pip install -r requirements.txt
+python src/main.py
+```
+
+## API Usage
+
+### Create Excel File
+
+```bash
+curl -X POST http://localhost:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tools/call",
+    "params": {
+      "name": "create_excel_file",
+      "arguments": {
+        "filename": "example.xlsx",
+        "headers": ["Name", "Value"],
+        "sheet_data": [["Item 1", "100"], ["Item 2", "200"]]
+      }
+    }
+  }'
+```
+
+## Available Tools
+
+- `create_excel_file` - Create Excel files with data & formatting
+- `get_excel_info` - Analyze existing Excel files
+- `create_excel_chart` - Add charts to Excel files
+- `format_excel_cells` - Apply formatting to cells
+- `import_csv_to_excel` - Convert CSV to Excel
+- `export_excel_to_csv` - Convert Excel to CSV
+
+## Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `HOST` | `0.0.0.0` | Server bind address |
+| `PORT` | `8000` | MCP server port |
+| `OUTPUT_DIR` | `./output` | Excel files directory |
+| `MAX_ROWS` | `10000` | Maximum rows per sheet |
+| `MAX_COLS` | `100` | Maximum columns per sheet |
+
+## AI Integration
+
+### Open-WebUI Integration
+
+Excel MCP integrates with Open-WebUI through:
+- **Pipe Functions**: Dedicated Excel assistant model
+- **Custom Tools**: Add Excel capabilities to any AI model
+
+Setup guides: [Open-WebUI Setup](docs/OPENWEBUI_SETUP.md) | [Pipe Setup](docs/OPENWEBUI_PIPE_SETUP.md)
+
+## Testing
+
+```bash
+# Run all tests
+python -m pytest tests/ -v
+
+# Run specific test
+python -m pytest tests/integration_test.py::test_mcp_workflow -v
+```
+
+## Deployment
+
+- **Docker**: `docker run antuelle78/excel-mcp-integration:latest`
+- **Docker Compose**: `docker compose up -d`
+- **Kubernetes**: `kubectl apply -f excel-mcp-deployment.yaml`
+
+## Documentation
+
+- [Open-WebUI Setup](docs/OPENWEBUI_SETUP.md)
+- [Deployment Guide](docs/DEPLOYMENT_GUIDE.md)
+- [API Reference](docs/OPENWEBUI_TOOLS_GUIDE.md)
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
 
 ## ✨ **What is Excel MCP?**
 
