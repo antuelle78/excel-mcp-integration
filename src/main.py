@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 MAX_ROWS = int(os.getenv('MAX_ROWS', '10000'))
 MAX_COLS = int(os.getenv('MAX_COLS', '100'))
 MAX_FILENAME_LENGTH = int(os.getenv('MAX_FILENAME_LENGTH', '255'))
-ALLOWED_EXTENSIONS = {'.xlsx', '.xls'}
+ALLOWED_EXTENSIONS = {'.xlsx', '.xls', '.xlsm'}
 OUTPUT_DIR = os.getenv('OUTPUT_DIR', './output')
 
 app = FastMCP()
@@ -484,6 +484,10 @@ def import_csv_to_excel(
 
         # Read CSV data
         if os.path.exists(csv_file):
+            # Validate file extension for CSV files
+            if not csv_file.lower().endswith('.csv'):
+                raise ValueError("Input file must be a CSV file (.csv extension)")
+
             # Read from file
             with open(csv_file, 'r', encoding='utf-8') as f:
                 csv_reader = csv.reader(f, delimiter=delimiter)
