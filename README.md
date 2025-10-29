@@ -526,7 +526,7 @@ export TIMEOUT=300
 ### 🎭 **Open-WebUI Integration**
 
 [![Open-WebUI](https://img.shields.io/badge/Open--WebUI-Integrated-FF6B35?style=for-the-badge&logo=ollama)](https://github.com/open-webui/open-webui)
-[![Pipe Function](https://img.shields.io/badge/Pipe--Function-Ready-4CAF50?style=for-the-badge)](docs/OPENWEBUI_PIPE_SETUP.md)
+[![Pipe Function](https://img.shields.io/badge/Pipe--Function-Ready-4CAF50?style=for-the-badge)](https://github.com/antuelle78/excel-mcp-integration/blob/main/docs/OPENWEBUI_PIPE_SETUP.md)
 
 **Transform your AI assistant into an Excel expert!** ✨
 
@@ -553,7 +553,7 @@ Assistant: "I'll create a professional Excel file with your Q4 sales data and ch
 - 🧠 **Smart Recognition**: Auto-detects spreadsheet requests
 - ⚡ **Instant Results**: Files ready in seconds
 
-**Setup:** [📖 Complete Pipe Setup Guide](docs/OPENWEBUI_PIPE_SETUP.md)
+**Setup:** [📖 Complete Pipe Setup Guide](https://github.com/antuelle78/excel-mcp-integration/blob/main/docs/OPENWEBUI_PIPE_SETUP.md)
 
 ---
 
@@ -575,7 +575,7 @@ Assistant: "I'll create a professional Excel file with your Q4 sales data and ch
 - 📋 **Pre-built Templates**: Ready-to-use configurations
 - 🎨 **Custom Branding**: Adapt to your needs
 
-**Setup:** [📖 Manual Setup Guide](docs/OPENWEBUI_SETUP.md)
+**Setup:** [📖 Manual Setup Guide](https://github.com/antuelle78/excel-mcp-integration/blob/main/docs/OPENWEBUI_SETUP.md)
 
 </div>
 
@@ -936,7 +936,7 @@ ollama list
 
 ### 🌟 **Welcome Contributors!**
 
-[![Contributors](https://img.shields.io/badge/Contributors-Welcome-4CAF50?style=for-the-badge&logo=github-sponsors)](CONTRIBUTING.md)
+[![Contributors](https://img.shields.io/badge/Contributors-Welcome-4CAF50?style=for-the-badge&logo=github-sponsors)](https://github.com/antuelle78/excel-mcp-integration/blob/main/CONTRIBUTING.md)
 [![Issues](https://img.shields.io/badge/Issues-Open-FF5722?style=for-the-badge&logo=github)](https://github.com/antuelle78/excel-mcp-integration/issues)
 
 </div>
@@ -990,7 +990,7 @@ graph LR
 
 *Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software...*
 
-[📖 **Full License Text**](LICENSE)
+[📖 **Full License Text**](https://github.com/antuelle78/excel-mcp-integration/blob/main/LICENSE)
 
 </div>
 
@@ -1007,7 +1007,7 @@ graph LR
 
 **Ways to Get Support:**
 
-1. **📖 Check** the [documentation](docs/) first
+1. **📖 Check** the [documentation](https://github.com/antuelle78/excel-mcp-integration/tree/main/docs) first
 2. **🔍 Search** existing [issues](https://github.com/antuelle78/excel-mcp-integration/issues)
 3. **💬 Start** a [discussion](https://github.com/antuelle78/excel-mcp-integration/discussions)
 4. **🐛 Report** bugs with detailed reproduction steps
