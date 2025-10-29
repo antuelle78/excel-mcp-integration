@@ -215,6 +215,81 @@ def create_excel_file(
         raise Exception(error_msg)
 
 @app.tool()
+def create_excel_workbook(
+    filename: str,
+    sheets: List[Dict[str, Any]]
+) -> str:
+    """
+    Creates an Excel workbook with multiple sheets and data.
+
+    Args:
+        filename: Name of the Excel file to create
+        sheets: List of sheet configurations, each containing:
+            - name: Sheet name
+            - headers: List of column headers
+            - data: 2D list of data rows
+            - formatting: Optional formatting options
+
+    Returns:
+        Success message with file path
+    """
+    try:
+        logger.info(f"Creating Excel workbook: {filename}")
+
+        # Validate inputs
+        safe_filename = validate_filename(filename)
+        if not sheets:
+            raise ValueError("At least one sheet must be provided")
+
+        # Create workbook
+        wb = Workbook()
+
+        # Remove default sheet
+        if wb.active:
+            wb.remove(wb.active)
+
+        # Create each sheet
+        for sheet_config in sheets:
+            sheet_name = sheet_config.get('name', 'Sheet1')
+            headers = sheet_config.get('headers', [])
+            data = sheet_config.get('data', [])
+            formatting = sheet_config.get('formatting')
+
+            # Validate sheet data
+            if headers and data:
+                validate_excel_data(headers, data)
+
+            # Create sheet
+            ws = wb.create_sheet(sheet_name)
+
+            # Add headers if provided
+            if headers:
+                ws.append(headers)
+
+            # Add data rows
+            for row in data:
+                ws.append(row)
+
+            # Apply formatting if provided
+            if formatting:
+                apply_formatting(ws, headers, formatting)
+
+        # Save file
+        wb.save(safe_filename)
+        logger.info(f"Successfully created Excel workbook: {safe_filename}")
+
+        return f"Successfully created Excel workbook: {safe_filename}"
+
+    except ValueError as e:
+        error_msg = f"Validation error: {str(e)}"
+        logger.error(error_msg)
+        raise ValueError(error_msg)
+    except Exception as e:
+        error_msg = f"Failed to create Excel workbook: {str(e)}"
+        logger.error(error_msg)
+        raise Exception(error_msg)
+
+@app.tool()
 def get_excel_info(filename: str) -> Dict[str, Any]:
     """
     Get information about an existing Excel file.
