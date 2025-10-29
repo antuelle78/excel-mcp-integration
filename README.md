@@ -206,7 +206,7 @@ graph TB
 | Service | Status | URL |
 |---------|--------|-----|
 | 🔧 **MCP Server** | 🟢 **Running** | `http://excelgen.e-cancer.fr:31006/mcp` |
-| 📁 **File Server** | 🟢 **Active** | `http://excelgen.e-cancer.fr:31007/files/` |
+| 📁 **File Server** | 🟢 **Active** | `http://10.2.0.150:31007/files/` |
 | 🤖 **AI Integration** | 🟢 **Tested** | Open-WebUI Compatible |
 | 🐳 **Docker** | 🟢 **Deployed** | `antuelle78/excel-mcp-integration` |
 | ☸️ **Kubernetes** | 🟢 **Ready** | `kubectl apply -f excel-mcp-deployment.yaml` |
@@ -919,7 +919,7 @@ spec:
 
 **External Access URLs (for testing only):**
 - **MCP Server**: `http://excelgen.e-cancer.fr:31006/mcp`
-- **File Downloads**: `http://excelgen.e-cancer.fr:31007/files/`
+- **File Downloads**: `http://10.2.0.150:31007/files/`
 
 **⚠️ Important:** Always use internal DNS for service-to-service communication within the cluster.
 

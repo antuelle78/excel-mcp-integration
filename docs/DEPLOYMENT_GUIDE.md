@@ -34,7 +34,7 @@ This guide provides instructions for deploying the Excel MCP server on a Kuberne
 The service is configured with NodePort and will be accessible at:
 
 - **MCP Server**: `http://excelgen.e-cancer.fr:31006/mcp`
-- **File Server**: `http://excelgen.e-cancer.fr:31007/files/`
+- **File Server**: `http://10.2.0.150:31007/files/`
 
 ## Open-WebUI Integration
 

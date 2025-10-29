@@ -21,7 +21,7 @@ class Tools:
         # IMPORTANT: Update these URLs based on your deployment method
         # For Kubernetes deployment in excel-mcp namespace:
         # - MCP server: http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp
-        # - File server: http://excel-mcp-service.excel-mcp.svc.cluster.local:8001/files/
+        # - File server: http://10.2.0.150:31007/files/ (direct IP to avoid DNS issues)
         #
         # For Docker deployment:
         # - MCP server: http://host.docker.internal:9080/mcp (or localhost:9080)
@@ -32,7 +32,7 @@ class Tools:
         # - File server: http://localhost:8001/files/
 
         self.mcp_server_url = os.getenv('MCP_SERVER_URL', "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp")
-        self.file_server_url = os.getenv('FILE_SERVER_URL', "http://excel-mcp-service.excel-mcp.svc.cluster.local:8001")  # For file downloads
+        self.file_server_url = os.getenv('FILE_SERVER_URL', "http://10.2.0.150:31007")  # For file downloads (direct IP)
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/event-stream"

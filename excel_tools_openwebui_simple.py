@@ -14,7 +14,7 @@ class Tools:
     def __init__(self):
         # For Kubernetes deployment in excel-mcp namespace:
         # - MCP server: http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp
-        # - File server: http://excel-mcp-service.excel-mcp.svc.cluster.local:8001/files/
+        # - File server: http://10.2.0.150:31007/files/ (direct IP to avoid DNS issues)
         #
         # For Docker deployment:
         # - MCP server: http://host.docker.internal:9080/mcp
@@ -25,7 +25,7 @@ class Tools:
         # - File server: http://localhost:8001/files/
 
         self.mcp_server_url = "http://excel-mcp-service.excel-mcp.svc.cluster.local:8000/mcp"
-        self.file_server_url = "http://excel-mcp-service.excel-mcp.svc.cluster.local:8001"
+        self.file_server_url = "http://10.2.0.150:31007"
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/event-stream"

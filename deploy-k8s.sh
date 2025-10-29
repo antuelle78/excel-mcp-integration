@@ -28,7 +28,7 @@ echo "✅ Deployment successful!"
 echo ""
 echo "🌐 Service URLs:"
 echo "   MCP Server: http://excelgen.e-cancer.fr:31006/mcp"
-echo "   File Server: http://excelgen.e-cancer.fr:31007/files/"
+echo "   File Server: http://10.2.0.150:31007/files/"
 echo ""
 echo "🔍 Pod status:"
 kubectl get pods -l app=excel-mcp
