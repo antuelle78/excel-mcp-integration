@@ -223,7 +223,7 @@ def get_excel_info(filename: str) -> Dict[str, Any]:
         filename: Name of the Excel file to analyze
 
     Returns:
-        Dictionary with file information
+        Dictionary with file information including sheets, dimensions, and metadata
     """
     try:
         safe_filename = validate_filename(filename)
@@ -231,15 +231,33 @@ def get_excel_info(filename: str) -> Dict[str, Any]:
         if not Path(safe_filename).exists():
             raise FileNotFoundError(f"File not found: {safe_filename}")
 
-        wb = Workbook()
-        wb.close()  # We would need openpyxl to read, but for now just check existence
+        # Load the workbook to get actual information
+        wb = load_workbook(safe_filename, read_only=True)
 
-        return {
+        # Get basic file info
+        file_info = {
             "filename": safe_filename,
             "exists": True,
             "size": Path(safe_filename).stat().st_size,
-            "message": "File exists and is accessible"
+            "sheets": [],
+            "total_sheets": len(wb.sheetnames),
+            "active_sheet": wb.active.title if wb.active else None
         }
+
+        # Get information about each sheet
+        for sheet_name in wb.sheetnames:
+            ws = wb[sheet_name]
+            sheet_info = {
+                "name": sheet_name,
+                "rows": ws.max_row,
+                "columns": ws.max_column,
+                "has_data": ws.max_row > 1 or ws.max_column > 0
+            }
+            file_info["sheets"].append(sheet_info)
+
+        wb.close()
+
+        return file_info
 
     except Exception as e:
         error_msg = f"Failed to get Excel info: {str(e)}"
