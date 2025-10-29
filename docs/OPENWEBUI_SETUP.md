@@ -4,7 +4,7 @@ This guide provides step-by-step instructions for integrating the Exel MCP Excel
 
 ## Prerequisites
 
-- ✅ Exel MCP server running on `http://127.0.0.1:8001`
+- ✅ Exel MCP server running on `http://localhost:9080`
 - ✅ Open-WebUI running on `http://localhost:8091`
 - ✅ Llama 3.1 8B model loaded in Ollama
 - ✅ Docker network connectivity between containers
@@ -242,7 +242,7 @@ Create an employee database with names, departments, salaries, and hire dates fo
 
 3. **MCP server errors**
    - Check container logs: `docker logs exel-mcp-server`
-   - Verify server is running: `curl http://127.0.0.1:8001/mcp`
+    - Verify server is running: `curl http://localhost:9080/mcp`
    - Check network connectivity
 
 4. **Invalid tool responses**
@@ -254,13 +254,13 @@ Create an employee database with names, departments, salaries, and hire dates fo
 
 ```bash
 # Check MCP server status
-curl -X POST http://127.0.0.1:8001/mcp \
+curl -X POST http://localhost:9080/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'
 
 # Test tool calling
-curl -X POST http://127.0.0.1:8001/mcp \
+curl -X POST http://localhost:9080/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -H "mcp-session-id: YOUR_SESSION_ID" \

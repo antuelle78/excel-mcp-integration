@@ -9,7 +9,7 @@ The Excel Assistant Pipe Function creates a custom model in Open-WebUI that can 
 ## Prerequisites
 
 - ✅ Open-WebUI installed and running
-- ✅ Exel MCP server running on `http://127.0.0.1:8001` (or configured endpoint)
+- ✅ Exel MCP server running on `http://localhost:9080` (or configured endpoint)
 - ✅ Python environment with required dependencies
 
 ## Installation Methods
@@ -85,7 +85,7 @@ If Open-WebUI supports function imports:
 - Ensure both containers are on the same Docker network
 
 **For local installations:**
-- Use `http://127.0.0.1:8001` if both services run locally
+- Use `http://localhost:9080` if both services run locally
 - Adjust firewall settings if needed
 
 ## Testing the Integration
@@ -135,7 +135,7 @@ Try these natural language commands:
 #### 2. "Failed to initialize MCP session"
 **Symptoms:** Errors about session initialization
 **Solutions:**
-- Verify MCP server is running: `curl http://127.0.0.1:8001/mcp`
+- Verify MCP server is running: `curl http://localhost:9080/mcp`
 - Check network connectivity between containers
 - Update `MCP_BASE_URL` valve to correct endpoint
 
@@ -164,7 +164,7 @@ Try these natural language commands:
 
 ```bash
 # Test MCP server connectivity
-curl -X POST http://127.0.0.1:8001/mcp \
+curl -X POST http://localhost:9080/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":"test","method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}'

@@ -41,7 +41,7 @@ This server allows Large Language Models (LLMs) to create and manipulate Excel s
 ### Current Deployment Status
 ✅ **Server is currently running and ready for use!**
 
-- **MCP Server**: Running at `http://127.0.0.1:8001/mcp`
+- **MCP Server**: Running at `http://your-server-ip:9080/mcp`
 - **Ollama Model**: Llama 3.1 8B Instruct (Q4_K_M) loaded and available
 - **Container**: Docker container `exel-mcp-server` active
 - **Integration**: LLM ↔ MCP communication tested and working
@@ -85,7 +85,7 @@ docker build -t exel-mcp .
 docker run -p 8001:8001 -v $(pwd)/output:/app/output exel-mcp
 ```
 
-The server will be available at `http://127.0.0.1:8001/mcp`
+The server will be available at `http://your-server-ip:9080/mcp`
 
 ## Configuration
 

@@ -21,8 +21,8 @@ class Tools:
         # IMPORTANT: Replace with the actual IP of the machine running the MCP server
         # MCP server runs on port 9080, file server on 9081 (Docker mapped ports)
         # Use host.docker.internal when Open-WebUI runs in Docker, otherwise localhost
-        self.mcp_server_url = "http://localhost:9080/mcp"
-        self.file_server_url = "http://host.docker.internal:9081"  # For file downloads (port 9081)
+        self.mcp_server_url = os.getenv('MCP_SERVER_URL', "http://localhost:9080/mcp")
+        self.file_server_url = os.getenv('FILE_SERVER_URL', "http://host.docker.internal:9081")  # For file downloads (port 9081)
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/event-stream"

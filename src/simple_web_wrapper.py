@@ -15,7 +15,7 @@ import os
 app = Flask(__name__)
 
 # Configuration
-MCP_BASE_URL = os.getenv('MCP_BASE_URL', 'http://127.0.0.1:8001')
+MCP_BASE_URL = os.getenv('MCP_BASE_URL', 'http://localhost:9080')
 API_PORT = int(os.getenv('API_PORT', '8080'))
 API_HOST = os.getenv('API_HOST', '0.0.0.0')
 
