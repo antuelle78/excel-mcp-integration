@@ -17,19 +17,19 @@ import urllib.parse
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Configuration
-MAX_ROWS = int(os.getenv('MAX_ROWS', '10000'))
-MAX_COLS = int(os.getenv('MAX_COLS', '100'))
-MAX_FILENAME_LENGTH = int(os.getenv('MAX_FILENAME_LENGTH', '255'))
-ALLOWED_EXTENSIONS = {'.xlsx', '.xls'}
-OUTPUT_DIR = os.getenv('OUTPUT_DIR', './output')
+MAX_ROWS = int(os.getenv("MAX_ROWS", "10000"))
+MAX_COLS = int(os.getenv("MAX_COLS", "100"))
+MAX_FILENAME_LENGTH = int(os.getenv("MAX_FILENAME_LENGTH", "255"))
+ALLOWED_EXTENSIONS = {".xlsx", ".xls"}
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "./output")
 
 app = FastMCP()
+
 
 def validate_filename(filename: str) -> str:
     """Validate and sanitize filename for security."""
@@ -40,14 +40,14 @@ def validate_filename(filename: str) -> str:
         raise ValueError(f"Filename too long (max {MAX_FILENAME_LENGTH} characters)")
 
     # Check for dangerous characters
-    dangerous_chars = ['/', '\\', '..', '<', '>', ':', '*', '?', '"', '|']
+    dangerous_chars = ["/", "\\", "..", "<", ">", ":", "*", "?", '"', "|"]
     for char in dangerous_chars:
         if char in filename:
             raise ValueError(f"Filename contains dangerous character: {char}")
 
     # Ensure proper extension
     if not any(filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS):
-        filename += '.xlsx'
+        filename += ".xlsx"
 
     # Create output directory if it doesn't exist
     output_path = Path(OUTPUT_DIR)
@@ -55,6 +55,7 @@ def validate_filename(filename: str) -> str:
 
     # Return full path
     return str(output_path / filename)
+
 
 def validate_excel_data(headers: List[str], sheet_data: List[List[str]]) -> None:
     """Validate Excel data structure and size."""
@@ -75,19 +76,24 @@ def validate_excel_data(headers: List[str], sheet_data: List[List[str]]) -> None
     expected_cols = len(headers)
     for i, row in enumerate(sheet_data):
         if len(row) != expected_cols:
-            raise ValueError(f"Row {i+1} has {len(row)} columns, expected {expected_cols}")
+            raise ValueError(
+                f"Row {i + 1} has {len(row)} columns, expected {expected_cols}"
+            )
 
-def validate_excel_request(filename: str, headers: List[str], sheet_data: List[List[str]]) -> Dict[str, Any]:
+
+def validate_excel_request(
+    filename: str, headers: List[str], sheet_data: List[List[str]]
+) -> Dict[str, Any]:
     """Comprehensive validation for Excel creation requests."""
     errors = []
     warnings = []
-    
+
     # Validate filename
     if not filename:
         errors.append("Filename is required")
     elif len(filename) > MAX_FILENAME_LENGTH:
         errors.append(f"Filename too long (max {MAX_FILENAME_LENGTH} characters)")
-    
+
     # Validate headers
     if not headers:
         errors.append("Headers array cannot be empty")
@@ -95,7 +101,7 @@ def validate_excel_request(filename: str, headers: List[str], sheet_data: List[L
         errors.append(f"Too many columns (max {MAX_COLS})")
     elif any(not isinstance(h, str) for h in headers):
         errors.append("All headers must be strings")
-    
+
     # Validate data
     if not sheet_data:
         errors.append("Sheet data cannot be empty")
@@ -106,26 +112,29 @@ def validate_excel_request(filename: str, headers: List[str], sheet_data: List[L
         expected_cols = len(headers)
         for i, row in enumerate(sheet_data):
             if not isinstance(row, list):
-                errors.append(f"Row {i+1} is not an array")
+                errors.append(f"Row {i + 1} is not an array")
             elif len(row) != expected_cols:
-                errors.append(f"Row {i+1} has {len(row)} columns, expected {expected_cols}")
+                errors.append(
+                    f"Row {i + 1} has {len(row)} columns, expected {expected_cols}"
+                )
             elif any(not isinstance(cell, str) for cell in row):
-                warnings.append(f"Row {i+1} contains non-string values (will be converted)")
-    
-    return {
-        "valid": len(errors) == 0,
-        "errors": errors,
-        "warnings": warnings
-    }
+                warnings.append(
+                    f"Row {i + 1} contains non-string values (will be converted)"
+                )
 
-def apply_formatting(ws, headers: List[str], formatting: Optional[Dict[str, Any]] = None) -> None:
+    return {"valid": len(errors) == 0, "errors": errors, "warnings": warnings}
+
+
+def apply_formatting(
+    ws, headers: List[str], formatting: Optional[Dict[str, Any]] = None
+) -> None:
     """Apply formatting to the worksheet."""
     if not formatting:
         return
 
     # Header formatting
     header_font = Font(bold=True)
-    header_alignment = Alignment(horizontal='center')
+    header_alignment = Alignment(horizontal="center")
 
     for col_num, _ in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col_num)
@@ -137,9 +146,63 @@ def apply_formatting(ws, headers: List[str], formatting: Optional[Dict[str, Any]
         column_letter = get_column_letter(col_num)
         max_length = 0
         for row_num in range(1, len(ws[column_letter]) + 1):
-            cell_value = str(ws.cell(row=row_num, column=col_num).value or '')
+            cell_value = str(ws.cell(row=row_num, column=col_num).value or "")
             max_length = max(max_length, len(cell_value))
         ws.column_dimensions[column_letter].width = min(max_length + 2, 50)
+
+
+def parse_cell_range(cell_range: str) -> tuple:
+    """
+    Parse Excel cell range notation (e.g., 'A1:C10') into row/column indices.
+
+    Args:
+        cell_range: Excel cell range in format 'A1:C10'
+
+    Returns:
+        Tuple of (start_row, end_row, start_col, end_col)
+
+    Raises:
+        ValueError: If cell_range format is invalid
+    """
+    try:
+        if ":" not in cell_range:
+            raise ValueError("Cell range must contain ':' separator")
+
+        parts = cell_range.split(":")
+        if len(parts) != 2:
+            raise ValueError("Cell range must have exactly 2 parts (start:end)")
+
+        start_cell = parts[0].strip().upper()
+        end_cell = parts[1].strip().upper()
+
+        # Parse start cell (e.g., 'A1')
+        start_col_match = re.match(r"([A-Z]+)(\d+)", start_cell)
+        if not start_col_match:
+            raise ValueError(f"Invalid start cell: {start_cell}")
+        start_col_letters = start_col_match.group(1)
+        start_row = int(start_col_match.group(2))
+
+        # Convert column letters to number (A=1, B=2, ..., Z=26, AA=27, etc.)
+        start_col = 0
+        for char in start_col_letters:
+            start_col = start_col * 26 + (ord(char) - ord("A") + 1)
+
+        # Parse end cell (e.g., 'C10')
+        end_col_match = re.match(r"([A-Z]+)(\d+)", end_cell)
+        if not end_col_match:
+            raise ValueError(f"Invalid end cell: {end_cell}")
+        end_col_letters = end_col_match.group(1)
+        end_row = int(end_col_match.group(2))
+
+        # Convert column letters to number
+        end_col = 0
+        for char in end_col_letters:
+            end_col = end_col * 26 + (ord(char) - ord("A") + 1)
+
+        return start_row, end_row, start_col, end_col
+    except Exception as e:
+        raise ValueError(f"Failed to parse cell range '{cell_range}': {str(e)}")
+
 
 @app.resource(uri="mcp://resources/system_prompt")
 def system_prompt() -> str:
@@ -153,13 +216,14 @@ def system_prompt() -> str:
         logger.error("system_prompt.txt not found")
         return "Excel file creation assistant"
 
+
 @app.tool()
 def create_excel_file(
     filename: str,
     headers: List[str],
     sheet_data: List[List[Any]],
     sheet_name: str = "Sheet1",
-    formatting: Optional[Dict[str, Any]] = None
+    formatting: Optional[Dict[str, Any]] = None,
 ) -> str:
     """
     Creates an Excel file with the given data.
@@ -214,6 +278,7 @@ def create_excel_file(
         logger.error(error_msg)
         raise Exception(error_msg)
 
+
 @app.tool()
 def get_excel_info(filename: str) -> Dict[str, Any]:
     """
@@ -231,20 +296,41 @@ def get_excel_info(filename: str) -> Dict[str, Any]:
         if not Path(safe_filename).exists():
             raise FileNotFoundError(f"File not found: {safe_filename}")
 
-        wb = Workbook()
-        wb.close()  # We would need openpyxl to read, but for now just check existence
+        # Load the actual workbook to get file information
+        wb = load_workbook(safe_filename)
 
-        return {
+        # Get sheet information
+        sheet_info = {}
+        for sheet_name in wb.sheetnames:
+            ws = wb[sheet_name]
+            sheet_info[sheet_name] = {
+                "dimensions": ws.dimensions,
+                "max_row": ws.max_row,
+                "max_column": ws.max_column,
+            }
+
+        # Get file statistics
+        file_size = Path(safe_filename).stat().st_size
+
+        result = {
             "filename": safe_filename,
             "exists": True,
-            "size": Path(safe_filename).stat().st_size,
-            "message": "File exists and is accessible"
+            "size": file_size,
+            "size_kb": round(file_size / 1024, 2),
+            "sheet_count": len(wb.sheetnames),
+            "sheets": wb.sheetnames,
+            "active_sheet": wb.active.title if wb.active else None,
+            "sheet_info": sheet_info,
         }
+
+        wb.close()
+        return result
 
     except Exception as e:
         error_msg = f"Failed to get Excel info: {str(e)}"
         logger.error(error_msg)
         return {"error": error_msg}
+
 
 @app.tool()
 def create_excel_chart(
@@ -252,7 +338,7 @@ def create_excel_chart(
     chart_type: str,
     data_range: str,
     title: Optional[str] = None,
-    sheet_name: Optional[str] = None
+    sheet_name: Optional[str] = None,
 ) -> str:
     """
     Add charts and graphs to existing Excel files.
@@ -270,7 +356,7 @@ def create_excel_chart(
     try:
         # Set default title if not provided
         if title is None:
-            title = f'{chart_type.title()} Chart'
+            title = f"{chart_type.title()} Chart"
 
         # Validate inputs
         if not filename or not chart_type or not data_range:
@@ -283,7 +369,7 @@ def create_excel_chart(
 
         # Load existing workbook
         wb = load_workbook(safe_filename)
-        
+
         # Select worksheet
         if sheet_name and sheet_name in wb.sheetnames:
             ws = wb[sheet_name]
@@ -307,7 +393,15 @@ def create_excel_chart(
 
         # Set data range
         try:
-            data = Reference(ws, min_col=1, min_row=1, max_col=ws.max_column, max_row=ws.max_row)
+            # Parse the data_range parameter to get specific cell range
+            start_row, end_row, start_col, end_col = parse_cell_range(data_range)
+            data = Reference(
+                ws,
+                min_col=start_col,
+                min_row=start_row,
+                max_col=end_col,
+                max_row=end_row,
+            )
             chart.add_data(data, titles_from_data=True)
         except Exception as e:
             raise ValueError(f"Invalid data range '{data_range}': {str(e)}")
@@ -329,12 +423,13 @@ def create_excel_chart(
         logger.error(error_msg)
         raise Exception(error_msg)
 
+
 @app.tool()
 def format_excel_cells(
     filename: str,
     cell_range: str,
     formatting: Dict[str, Any],
-    sheet_name: Optional[str] = None
+    sheet_name: Optional[str] = None,
 ) -> str:
     """
     Apply formatting to Excel cells including colors, borders, fonts, and styles.
@@ -349,7 +444,6 @@ def format_excel_cells(
         Success message with formatting details
     """
     try:
-
         # Validate inputs
         if not filename or not cell_range or not formatting:
             raise ValueError("filename, cell_range, and formatting are required")
@@ -361,7 +455,7 @@ def format_excel_cells(
 
         # Load existing workbook
         wb = load_workbook(safe_filename)
-        
+
         # Select worksheet
         if sheet_name and sheet_name in wb.sheetnames:
             ws = wb[sheet_name]
@@ -374,59 +468,61 @@ def format_excel_cells(
         # Parse cell range and apply formatting
         try:
             # Simple approach: iterate through range manually
-            # Parse range like "A1:C10"
-            range_parts = cell_range.split(':')
-            start_cell = range_parts[0]
-            
-            # For now, just format a simple range
-            # This is a simplified implementation
-            for row_idx in range(1, 11):  # Rows 1-10
-                for col_idx in range(1, 6):   # Columns A-E
+            # Parse the cell_range using the helper function
+            start_row, end_row, start_col, end_col = parse_cell_range(cell_range)
+
+            # Apply formatting to all cells in the range
+            for row_idx in range(start_row, end_row + 1):
+                for col_idx in range(start_col, end_col + 1):
                     cell = ws.cell(row=row_idx, column=col_idx)
-                    
+
                     # Font formatting
                     font_kwargs = {}
-                    if formatting.get('bold') is not None:
-                        font_kwargs['bold'] = formatting['bold']
-                    if formatting.get('italic') is not None:
-                        font_kwargs['italic'] = formatting['italic']
-                    if formatting.get('underline') is not None:
-                        font_kwargs['underline'] = formatting['underline']
-                    if formatting.get('font_size') is not None:
-                        font_kwargs['size'] = formatting['font_size']
-                    if formatting.get('font_color'):
-                        font_kwargs['color'] = formatting['font_color']
-                    
+                    if formatting.get("bold") is not None:
+                        font_kwargs["bold"] = formatting["bold"]
+                    if formatting.get("italic") is not None:
+                        font_kwargs["italic"] = formatting["italic"]
+                    if formatting.get("underline") is not None:
+                        font_kwargs["underline"] = formatting["underline"]
+                    if formatting.get("font_size") is not None:
+                        font_kwargs["size"] = formatting["font_size"]
+                    if formatting.get("font_color"):
+                        font_kwargs["color"] = formatting["font_color"]
+
                     if font_kwargs:
                         cell.font = Font(**font_kwargs)
 
                     # Fill formatting
-                    if formatting.get('background_color'):
-                        cell.fill = PatternFill(start_color=formatting['background_color'], 
-                                                           end_color=formatting['background_color'], 
-                                                           fill_type='solid')
+                    if formatting.get("background_color"):
+                        cell.fill = PatternFill(
+                            start_color=formatting["background_color"],
+                            end_color=formatting["background_color"],
+                            fill_type="solid",
+                        )
 
                     # Alignment
-                    if formatting.get('alignment'):
-                        cell.alignment = Alignment(horizontal=formatting['alignment'])
+                    if formatting.get("alignment"):
+                        cell.alignment = Alignment(horizontal=formatting["alignment"])
 
                     # Border
-                    if formatting.get('border'):
-                        border_color = formatting.get('border_color', '000000')
+                    if formatting.get("border"):
+                        border_color = formatting.get("border_color", "000000")
                         thin_border = Border(
-                            left=Side(style='thin', color=border_color),
-                            right=Side(style='thin', color=border_color),
-                            top=Side(style='thin', color=border_color),
-                            bottom=Side(style='thin', color=border_color)
+                            left=Side(style="thin", color=border_color),
+                            right=Side(style="thin", color=border_color),
+                            top=Side(style="thin", color=border_color),
+                            bottom=Side(style="thin", color=border_color),
                         )
                         cell.border = thin_border
-                        
+
         except Exception as e:
             raise ValueError(f"Invalid cell range '{cell_range}': {str(e)}")
 
         # Save workbook
         wb.save(safe_filename)
-        logger.info(f"Successfully applied formatting to {cell_range} in {safe_filename}")
+        logger.info(
+            f"Successfully applied formatting to {cell_range} in {safe_filename}"
+        )
 
         return f"Successfully applied formatting to {cell_range} in {safe_filename}"
 
@@ -435,13 +531,14 @@ def format_excel_cells(
         logger.error(error_msg)
         raise Exception(error_msg)
 
+
 @app.tool()
 def import_csv_to_excel(
     csv_file: str,
     excel_file: str,
     delimiter: str = ",",
     has_headers: bool = True,
-    sheet_name: str = "Sheet1"
+    sheet_name: str = "Sheet1",
 ) -> str:
     """
     Convert CSV files to Excel format with proper formatting and structure.
@@ -457,7 +554,6 @@ def import_csv_to_excel(
         Success message with file path
     """
     try:
-
         # Validate inputs
         if not csv_file or not excel_file:
             raise ValueError("csv_file and excel_file are required")
@@ -467,7 +563,7 @@ def import_csv_to_excel(
         # Read CSV data
         if os.path.exists(csv_file):
             # Read from file
-            with open(csv_file, 'r', encoding='utf-8') as f:
+            with open(csv_file, "r", encoding="utf-8") as f:
                 csv_reader = csv.reader(f, delimiter=delimiter)
                 rows = list(csv_reader)
         else:
@@ -492,7 +588,7 @@ def import_csv_to_excel(
             headers = rows[0]
             data_rows = rows[1:]
         else:
-            headers = [f"Column {i+1}" for i in range(len(rows[0]))]
+            headers = [f"Column {i + 1}" for i in range(len(rows[0]))]
             data_rows = rows
 
         # Add headers
@@ -518,13 +614,14 @@ def import_csv_to_excel(
         logger.error(error_msg)
         raise Exception(error_msg)
 
+
 @app.tool()
 def export_excel_to_csv(
     excel_file: str,
     csv_file: str,
     sheet_name: Optional[str] = None,
     delimiter: str = ",",
-    include_headers: bool = True
+    include_headers: bool = True,
 ) -> str:
     """
     Export Excel worksheets to CSV format.
@@ -540,19 +637,18 @@ def export_excel_to_csv(
         Success message with CSV file path
     """
     try:
-
         # Validate inputs
         if not excel_file or not csv_file:
             raise ValueError("excel_file and csv_file are required")
 
         safe_excel_file = validate_filename(excel_file)
-        
+
         if not Path(safe_excel_file).exists():
             raise FileNotFoundError(f"Excel file not found: {safe_excel_file}")
 
         # Load workbook
         wb = load_workbook(safe_excel_file)
-        
+
         # Select worksheet
         if sheet_name and sheet_name in wb.sheetnames:
             ws = wb[sheet_name]
@@ -564,7 +660,7 @@ def export_excel_to_csv(
         if ws is not None:
             for row in ws.iter_rows(values_only=True):
                 # Convert None to empty string
-                row_data = [cell if cell is not None else '' for cell in row]
+                row_data = [cell if cell is not None else "" for cell in row]
                 data.append(row_data)
 
         if not data:
@@ -575,14 +671,14 @@ def export_excel_to_csv(
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Write to CSV
-        with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+        with open(csv_file, "w", newline="", encoding="utf-8") as f:
             csv_writer = csv.writer(f, delimiter=delimiter)
-            
+
             # Write headers if requested
             if include_headers and data:
                 csv_writer.writerow(data[0])
                 data = data[1:]
-            
+
             # Write data rows
             csv_writer.writerows(data)
 
@@ -595,86 +691,95 @@ def export_excel_to_csv(
         logger.error(error_msg)
         raise Exception(error_msg)
 
+
 class FileHandler(SimpleHTTPRequestHandler):
     """Custom handler to serve files from output directory."""
-    
-    def __init__(self, *args, **kwargs):
+
+    def __init__(self, *args, **kwargs) -> None:
+        """Initialize the file handler for serving files from output directory."""
         # Don't set directory here, we'll handle paths manually
         super().__init__(*args, **kwargs)
-    
-    def do_GET(self):
+
+    def do_GET(self) -> None:
+        """Handle HTTP GET requests for file downloads."""
         # Parse the path
         parsed_path = urllib.parse.urlparse(self.path)
-        file_path = parsed_path.path.lstrip('/')
-        
+        file_path = parsed_path.path.lstrip("/")
+
         # Check if this is a file request
-        if file_path.startswith('files/'):
+        if file_path.startswith("files/"):
             filename = file_path[6:]  # Remove 'files/' prefix
             file_full_path = Path(OUTPUT_DIR) / filename
-            
+
             # Security check - ensure file is within output directory
             try:
                 file_full_path.resolve().relative_to(Path(OUTPUT_DIR).resolve())
             except ValueError:
                 self.send_error(403, "Access denied")
                 return
-            
+
             # Check if file exists
             if file_full_path.exists() and file_full_path.is_file():
                 # Serve the file
                 self.send_response(200)
                 content_type = self.guess_type(str(file_full_path))
-                self.send_header('Content-Type', content_type)
-                self.send_header('Content-Disposition', f'attachment; filename="{filename}"')
-                self.send_header('Content-Length', str(file_full_path.stat().st_size))
+                self.send_header("Content-Type", content_type)
+                self.send_header(
+                    "Content-Disposition", f'attachment; filename="{filename}"'
+                )
+                self.send_header("Content-Length", str(file_full_path.stat().st_size))
                 self.end_headers()
-                
-                with open(file_full_path, 'rb') as f:
+
+                with open(file_full_path, "rb") as f:
                     self.wfile.write(f.read())
             else:
                 self.send_error(404, f"File not found: {filename}")
         else:
             # Default behavior for other paths
             self.send_error(404, "Not found")
-    
-    def do_HEAD(self):
-        # Handle HEAD requests for file existence checks
+
+    def do_HEAD(self) -> None:
+        """Handle HTTP HEAD requests for file existence checks."""
         parsed_path = urllib.parse.urlparse(self.path)
-        file_path = parsed_path.path.lstrip('/')
-        
-        if file_path.startswith('files/'):
+        file_path = parsed_path.path.lstrip("/")
+
+        if file_path.startswith("files/"):
             filename = file_path[6:]  # Remove 'files/' prefix
             file_full_path = Path(OUTPUT_DIR) / filename
-            
+
             # Security check
             try:
                 file_full_path.resolve().relative_to(Path(OUTPUT_DIR).resolve())
             except ValueError:
                 self.send_error(403, "Access denied")
                 return
-            
+
             if file_full_path.exists() and file_full_path.is_file():
                 self.send_response(200)
                 content_type = self.guess_type(str(file_full_path))
-                self.send_header('Content-Type', content_type)
-                self.send_header('Content-Disposition', f'attachment; filename="{filename}"')
-                self.send_header('Content-Length', str(file_full_path.stat().st_size))
+                self.send_header("Content-Type", content_type)
+                self.send_header(
+                    "Content-Disposition", f'attachment; filename="{filename}"'
+                )
+                self.send_header("Content-Length", str(file_full_path.stat().st_size))
                 self.end_headers()
             else:
                 self.send_error(404, f"File not found: {filename}")
         else:
             self.send_error(404, "Not found")
 
+
 def start_file_server():
     """Start a simple HTTP server for file downloads."""
-    file_server_port = int(os.getenv('FILE_SERVER_PORT', '8001'))
-    server = HTTPServer(('0.0.0.0', file_server_port), FileHandler)
+    file_server_port = int(os.getenv("FILE_SERVER_PORT", "8001"))
+    server = HTTPServer(("0.0.0.0", file_server_port), FileHandler)
     logger.info(f"File server started on port {file_server_port}")
     server.serve_forever()
 
+
 if __name__ == "__main__":
-    host = os.getenv('HOST', '0.0.0.0')
-    port = int(os.getenv('PORT', '8000'))
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "8000"))
 
     logger.info(f"Starting Exel MCP server on {host}:{port}")
     logger.info(f"Output directory: {OUTPUT_DIR}")

@@ -1,18 +1,23 @@
 # AGENTS.md - Exel MCP Server
 
-## Commands
-- **Build**: `poetry build` or `docker build .`
-- **Run**: `poetry run python main.py` or `docker-compose up`
-- **Test**: `poetry run pytest`
-- **Test single file**: `poetry run pytest tests/test_file.py`
-- **Format**: `black .`
+## Build/Lint/Test Commands
 
-## Code Style
-- Follow PEP 8 style guide
-- Use type hints for function parameters and return types
-- Write docstrings for all public functions
-- Use snake_case for variables and functions
-- Handle exceptions appropriately, avoid bare except clauses
-- Import order: standard library, third-party, local modules
-- Line length: 88 characters (Black default)
-- Use f-strings for string formatting
+- **Install dependencies**: `pip install -r requirements.txt` (or `poetry install`)
+- **No build needed**: This is a Python MCP server; no compilation required
+- **Run server**: `python src/main.py` or `docker-compose up`
+- **Run all tests**: `python -m pytest tests/ -v`
+- **Run single test**: `python -m pytest tests/integration_test.py -v`
+- **Run specific test file**: `python -m pytest tests/test_core_functions.py -v`
+- **No linter configured**: Ensure PEP 8 compliance manually
+
+## Code Style Guidelines
+
+- **Imports**: Standard library → third-party → local modules (fastmcp, openpyxl, then local)
+- **Formatting**: PEP 8 compliant, 88 char line length, f-strings for formatting
+- **Types**: Full type hints on all function parameters and return types (e.g., `def validate_filename(filename: str) -> str:`)
+- **Naming**: `snake_case` for functions/variables, `UPPER_CASE` for constants (e.g., `MAX_ROWS`, `OUTPUT_DIR`)
+- **Docstrings**: Required for all public functions (see src/main.py examples)
+- **Error handling**: No bare `except:` clauses; catch specific exceptions, use ValueError/TypeError appropriately
+- **Logging**: Use `logging` module with structured format; logger initialized at module level
+- **Security**: Input validation essential (filename sanitization, path traversal prevention, dangerous character filtering)
+- **Comments**: Minimal comments; code should be self-documenting via clear naming and type hints

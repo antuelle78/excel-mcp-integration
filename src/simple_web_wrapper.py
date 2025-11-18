@@ -7,6 +7,7 @@ Designed for users who only have web interface access to Open-WebUI.
 """
 
 from flask import Flask, request, jsonify
+from typing import Dict, Any, Tuple, Optional
 import requests
 import json
 import uuid
@@ -22,7 +23,7 @@ API_HOST = os.getenv('API_HOST', '0.0.0.0')
 # Global session ID
 mcp_session_id = None
 
-def get_mcp_session():
+def get_mcp_session() -> Optional[str]:
     """Get or create MCP session"""
     global mcp_session_id
     if mcp_session_id:
@@ -60,7 +61,7 @@ def get_mcp_session():
 
     return None
 
-def call_mcp_tool(tool_name, arguments):
+def call_mcp_tool(tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
     """Call an MCP tool and return the result"""
     session_id = get_mcp_session()
     if not session_id:
@@ -102,7 +103,7 @@ def call_mcp_tool(tool_name, arguments):
         return {"error": f"Request failed: {str(e)}"}
 
 @app.route('/', methods=['GET'])
-def index():
+def index() -> Dict[str, Any]:
     """API information"""
     return jsonify({
         "service": "Excel MCP Web Wrapper",
@@ -117,7 +118,7 @@ def index():
     })
 
 @app.route('/health', methods=['GET'])
-def health():
+def health() -> Tuple[Dict[str, Any], int]:
     """Health check"""
     session_id = get_mcp_session()
     return jsonify({
@@ -127,7 +128,7 @@ def health():
     })
 
 @app.route('/create_excel', methods=['POST'])
-def create_excel():
+def create_excel() -> Tuple[Dict[str, Any], int]:
     """Create Excel file from JSON data"""
     try:
         data = request.get_json()
