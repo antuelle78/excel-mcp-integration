@@ -204,6 +204,13 @@ def parse_cell_range(cell_range: str) -> tuple:
         raise ValueError(f"Failed to parse cell range '{cell_range}': {str(e)}")
 
 
+def format_success_with_download(filename: str, message: str) -> str:
+    """Format success message with download link."""
+    file_server_port = int(os.getenv("FILE_SERVER_PORT", "8001"))
+    download_url = f"http://localhost:{file_server_port}/files/{filename}"
+    return f"{message}\n\n📥 **Download:** {download_url}"
+
+
 @app.resource(uri="mcp://resources/system_prompt")
 def system_prompt() -> str:
     """
@@ -267,7 +274,9 @@ def create_excel_file(
         wb.save(safe_filename)
         logger.info(f"Successfully created Excel file: {safe_filename}")
 
-        return f"Successfully created Excel file: {safe_filename}"
+        return format_success_with_download(
+            filename, f"Successfully created Excel file: {safe_filename}"
+        )
 
     except ValueError as e:
         error_msg = f"Validation error: {str(e)}"
@@ -416,7 +425,10 @@ def create_excel_chart(
         wb.save(safe_filename)
         logger.info(f"Successfully added {chart_type} chart to {safe_filename}")
 
-        return f"Successfully added {chart_type} chart '{title}' to {safe_filename}"
+        return format_success_with_download(
+            filename,
+            f"Successfully added {chart_type} chart '{title}' to {safe_filename}",
+        )
 
     except Exception as e:
         error_msg = f"Failed to create chart: {str(e)}"
@@ -524,7 +536,10 @@ def format_excel_cells(
             f"Successfully applied formatting to {cell_range} in {safe_filename}"
         )
 
-        return f"Successfully applied formatting to {cell_range} in {safe_filename}"
+        return format_success_with_download(
+            filename,
+            f"Successfully applied formatting to {cell_range} in {safe_filename}",
+        )
 
     except Exception as e:
         error_msg = f"Failed to format cells: {str(e)}"
@@ -607,7 +622,9 @@ def import_csv_to_excel(
         wb.save(safe_excel_file)
         logger.info(f"Successfully converted CSV to Excel: {safe_excel_file}")
 
-        return f"Successfully converted CSV to Excel: {safe_excel_file}"
+        return format_success_with_download(
+            excel_file, f"Successfully converted CSV to Excel: {safe_excel_file}"
+        )
 
     except Exception as e:
         error_msg = f"Failed to import CSV to Excel: {str(e)}"
@@ -684,7 +701,9 @@ def export_excel_to_csv(
 
         logger.info(f"Successfully exported Excel to CSV: {csv_file}")
 
-        return f"Successfully exported Excel to CSV: {csv_file}"
+        return format_success_with_download(
+            csv_file, f"Successfully exported Excel to CSV: {csv_file}"
+        )
 
     except Exception as e:
         error_msg = f"Failed to export Excel to CSV: {str(e)}"
