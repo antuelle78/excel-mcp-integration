@@ -176,7 +176,7 @@ class Tools:
             return error_msg
 
     def _process_result_with_file_access(self, result: dict) -> str:
-        """Process result and add file download information."""
+        """Process result and ensure download links are present."""
         if not isinstance(result, dict):
             return json.dumps(result, indent=2)
 
@@ -193,17 +193,25 @@ class Tools:
             if isinstance(item, dict) and item.get("type") == "text":
                 text = item.get("text", "")
 
-                # Look for file creation messages - expanded patterns
+                # Check if download link already exists (server now includes it)
+                has_download_link = (
+                    "📥 **Download:**" in text or "🔗 **Download Link:**" in text
+                )
+
+                # Look for file creation/modification messages
                 if (
                     "Successfully created Excel file" in text
+                    or "Successfully added" in text
+                    or "Successfully applied formatting" in text
+                    or "Successfully converted" in text
+                    or "Successfully exported" in text
                     or "has been created" in text
-                    or "created" in text
-                ) and ".xlsx" in text:
+                ) and (".xlsx" in text or ".csv" in text):
                     # Extract filename - handle multiple patterns
                     file_match = (
-                        re.search(r"output/([^\.]+\.xlsx)", text)
-                        or re.search(r"\*\*([^\.]+\.xlsx)\*\*", text)
-                        or re.search(r"([a-zA-Z0-9_\-]+\.xlsx)", text)
+                        re.search(r"output/([a-zA-Z0-9_\-]+\.(?:xlsx|csv))", text)
+                        or re.search(r"\*\*([a-zA-Z0-9_\-]+\.(?:xlsx|csv))\*\*", text)
+                        or re.search(r"([a-zA-Z0-9_\-]+\.(?:xlsx|csv))", text)
                     )
                     if file_match:
                         filename = file_match.group(1)
@@ -221,14 +229,18 @@ class Tools:
                             "name": filename,
                             "path": file_path,
                             "download_url": download_url,
-                            "type": "excel",
+                            "type": "excel" if ".xlsx" in filename else "csv",
                         }
 
-                        # Enhance the message with download info
-                        enhanced_text = f"{text}\n\n📁 **File Created:** {filename}\n🔗 **Download Link:** [{download_url}]({download_url})\n💡 *You can download this Excel file using the link above*"
-                        processed_content.append(
-                            {"type": "text", "text": enhanced_text}
-                        )
+                        # If server didn't include download link, add it
+                        if not has_download_link:
+                            enhanced_text = f"{text}\n\n📥 **Download:** {download_url}"
+                            processed_content.append(
+                                {"type": "text", "text": enhanced_text}
+                            )
+                        else:
+                            # Server already included link, just pass through
+                            processed_content.append(item)
                     else:
                         processed_content.append(item)
                 else:
@@ -243,7 +255,7 @@ class Tools:
         if file_info:
             enhanced_result["files"] = file_info
             enhanced_result["download_instructions"] = (
-                "Click on the download links above to access your Excel files"
+                "Files are ready for download via the links above"
             )
 
         return json.dumps(enhanced_result, indent=2)
