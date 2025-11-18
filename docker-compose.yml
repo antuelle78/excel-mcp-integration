@@ -1,6 +1,7 @@
 services:
   exel-mcp:
     build: .
+    runtime: runc
     ports:
       - "9080:9080"  # MCP server
       - "8001:8001"  # File server
