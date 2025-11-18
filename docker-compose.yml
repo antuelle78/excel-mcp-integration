@@ -2,7 +2,12 @@ services:
   exel-mcp:
     build: .
     ports:
-      - "9080:8000"  # MCP server
-      - "9081:8001"  # File server
+      - "9080:9080"  # MCP server
+      - "8001:8001"  # File server
+    environment:
+      - PORT=9080
+      - HOST=0.0.0.0
+      - FILE_SERVER_PORT=8001
     volumes:
       - .:/app
+      - ./output:/app/output
