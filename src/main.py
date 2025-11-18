@@ -404,6 +404,8 @@ def create_excel_chart(
         try:
             # Parse the data_range parameter to get specific cell range
             start_row, end_row, start_col, end_col = parse_cell_range(data_range)
+
+            # Add data to chart with proper series configuration
             data = Reference(
                 ws,
                 min_col=start_col,
@@ -411,7 +413,30 @@ def create_excel_chart(
                 max_col=end_col,
                 max_row=end_row,
             )
+
+            # Add data with titles from first row
             chart.add_data(data, titles_from_data=True)
+
+            # For data series, use columns starting from second column
+            if end_col > start_col:
+                for col in range(start_col + 1, end_col + 1):
+                    series_data = Reference(
+                        ws,
+                        min_col=col,
+                        min_row=start_row,
+                        max_row=end_row,
+                    )
+                    chart.series.append(series_data)
+
+            # Set category labels (first column)
+            categories = Reference(
+                ws,
+                min_col=start_col,
+                min_row=start_row + 1,
+                max_row=end_row,
+            )
+            chart.set_categories(categories)
+
         except Exception as e:
             raise ValueError(f"Invalid data range '{data_range}': {str(e)}")
 
