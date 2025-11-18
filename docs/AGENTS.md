@@ -1,5 +1,13 @@
 # AGENTS.md - Exel MCP Server
 
+## Agent Guidelines
+
+- **Reports**: Only produce reports if explicitly requested
+- **Conciseness**: Be concise; avoid unnecessary verbosity
+- **Efficiency**: Be economical with context consumption
+- **Focus**: Address the task directly without tangential information
+- **Output**: Minimal but complete; no padding or filler
+
 ## Build/Lint/Test Commands
 
 - **Install dependencies**: `pip install -r requirements.txt` (or `poetry install`)
